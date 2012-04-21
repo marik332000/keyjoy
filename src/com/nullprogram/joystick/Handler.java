@@ -1,6 +1,5 @@
 package com.nullprogram.joystick;
 
-import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
@@ -8,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
+import lombok.Getter;
 import lombok.extern.java.Log;
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
@@ -28,6 +28,7 @@ public class Handler extends JComponent implements Runnable {
 
     private final Deque<Action> actions = new LinkedList<Action>();
 
+    @Getter
     private final List<Combo> combos = new ArrayList<Combo>();
 
     public Handler(Controller input) {
@@ -36,19 +37,6 @@ public class Handler extends JComponent implements Runnable {
         for (Component c : controller.getComponents()) {
             map.put(c, counter++);
         }
-
-        //Combo diag = new Combo(9);
-        //diag.add(new Action(12, 1, 0));
-        //diag.add(new Action(13, 1, 0));
-        //combos.add(diag);
-
-        //Combo down = new Combo(1);
-        //down.add(new Action(13, 1, 0));
-        //combos.add(down);
-
-        //Combo right = new Combo(2);
-        //right.add(new Action(12, 1, 0));
-        //combos.add(right);
     }
 
     @Override
@@ -69,6 +57,7 @@ public class Handler extends JComponent implements Runnable {
                     continue;
                 }
                 Action a = new Action(component, direction, System.nanoTime());
+                log.info(a.toString());
                 actions.offerLast(a);
             }
 
@@ -95,7 +84,7 @@ public class Handler extends JComponent implements Runnable {
                now - actions.peekFirst().getTime() > WINDOW) {
             Action init = actions.pollFirst();
             long start = init.getTime();
-            Combo combo = new Combo(0);
+            Combo combo = new Combo();
             combo.add(init);
             hit = find(combo, null);
             for (Action a : actions) {
@@ -108,9 +97,10 @@ public class Handler extends JComponent implements Runnable {
             }
         }
 
-        /* Remove claimed actions. */
+        /* Remove claimed actions and execute. */
         if (hit != null) {
             actions.removeAll(hit.getActions());
+            hit.execute();
         }
     }
 
@@ -121,9 +111,5 @@ public class Handler extends JComponent implements Runnable {
             }
         }
         return def;
-    }
-
-    public Deque<Action> read() {
-        return new LinkedList<Action>(actions);
     }
 }
