@@ -26,12 +26,12 @@ public class Launcher {
         }
 
         Handler handler = new Handler(controllers[0]);
-        setBindings(handler);
+        setDCSSBindings(handler);
         handler.run();
     }
 
     /* Hard code my keybindings. */
-    private static void setBindings(Handler h) {
+    private static void setDCSSBindings(Handler h) {
         List<Combo> combos = h.getCombos();
 
         /* Movement */
@@ -86,5 +86,14 @@ public class Launcher {
         downstair.press(KeyEvent.VK_SHIFT).press(KeyEvent.VK_GREATER);
         downstair.add(new Action(7, 1, 0));
         combos.add(downstair);
+
+        Combo search = new Combo().press(KeyEvent.VK_5);
+        search.add(new Action(3, 1, 0));
+        combos.add(search);
+
+        Combo map = new Combo();
+        map.press(KeyEvent.VK_SHIFT).press(KeyEvent.VK_X);
+        map.add(new Action(4, 1, 0));
+        combos.add(map);
     }
 }
